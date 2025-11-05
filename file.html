@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relational Model</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #f9f9f9;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 10px;
+        }
+        pre {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: "Courier New", Courier, monospace;
+            font-size: 1.1em;
+            white-space: pre-wrap;       /* Copes with long lines */
+            word-wrap: break-word;       /* Copes with long lines */
+        }
+        u {
+            text-decoration: underline;
+        }
+        i {
+            font-style: italic;
+            color: #2980b9;
+        }
+        .relation {
+            margin-bottom: 15px;
+        }
+        .relation-name {
+            font-weight: bold;
+            font-size: 1.2em;
+            color: #2c3e50;
+        }
+        .attributes {
+            font-family: "Courier New", Courier, monospace;
+            font-size: 1.1em;
+        }
+        .fk-list {
+            list-style-type: none;
+            padding-left: 20px;
+            font-size: 0.95em;
+            color: #555;
+        }
+        .fk-list li {
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Relational Model</h1>
+
+        <div class="relation">
+            <span class="relation-name">Client</span> (<span class="attributes"><u>client_id</u>, first_name, middle_name, last_name, country, client_type, client_status, tax_id</span>)
+        </div>
+
+        <div class="relation">
+            <span class="relation-name">User</span> (<span class="attributes"><u>user_id</u>, department, role, email, last_login</span>)
+        </div>
+
+        <div class="relation">
+            <span class="relation-name">Account</span> (<span class="attributes"><u>account_id</u>, <i>client_id</i>, opening_date, account_type, status, <i>manager_id</i></span>)
+            <ul class="fk-list">
+                <li><i>client_id</i> refers to client_id in Client, NOT NULL.</li>
+                <li><i>manager_id</i> refers to user_id in User, NOT NULL.</li>
+            </ul>
+        </div>
+
+        <div class="relation">
+            <span class="relation-name">Counterparty</span> (<span class="attributes"><u>counterparty_id</u>, counterparty_name, counterparty_type, credit_limit, settlement_instructions</span>)
+        </div>
+
+        <div class="relation">
+            <span class="relation-name">Security</span> (<span class="attributes"><u>cusip</u>, symbol, security_name, security_type, exchange</span>)
+        </div>
+
+        <div class="relation">
+            <span class="relation-name">Bond</span> (<span class="attributes"><u><i>cusip</i></u>, face_value, coupon_rate, maturity_date</span>)
+            <ul class="fk-list">
+                <li><i>cusip</i> refers to cusip in Security, NOT NULL.</li>
+            </ul>
+        </div>
+
+        <div class="relation">
+            <span class="relation-name">Equity</span> (<span class="attributes"><u><i>cusip</i></u></span>)
+            <ul class="fk-list">
+                <li><i>cusip</i> refers to cusip in Security, NOT NULL.</li>
+            </ul>
+        </div>
+
+        <div class="relation">
+            <span class="relation-name">Trade</span> (<span class="attributes"><u>transaction_id</u>, <i>account_id</i>, <i>cusip</i>, <i>counterparty_id</i>, trade_id, transaction_type, price, units, settlement_date, execution_date</span>)
+            <ul class="fk-list">
+                <li><i>account_id</i> refers to account_id in Account, NOT NULL.</li>
+                <li><i>cusip</i> refers to cusip in Security, NOT NULL.</li>
+                <li><i>counterparty_id</i> refers to counterparty_id in Counterparty, NOT NULL.</li>
+            </ul>
+        </div>
+
+        <div class="relation">
+            <span class="relation-name">Lot</span> (<span class="attributes"><u>lot_id</u>, <i>trade_id</i>, <i>account_id</i>, <i>cusip</i>, units, cost_basis, acquisition_date</span>)
+            <ul class="fk-list">
+                <li><i>trade_id</i> refers to transaction_id in Trade, NOT NULL.</li>
+                <li><i>account_id</i> refers to account_id in Account, NOT NULL.</li>
+                <li><i>cusip</i> refers to cusip in Security, NOT NULL.</li>
+            </ul>
+        </div>
+
+        <div class="relation">
+            <span class="relation-name">Journal</span> (<span class="attributes"><u>journal_id</u>, <i>trade_id</i>, <i>account_id</i>, journal_type, amount, entry_date</span>)
+            <ul class="fk-list">
+                <li><i>trade_id</i> refers to transaction_id in Trade, NOT NULL.</li>
+                <li><i>account_id</i> refers to account_id in Account, NOT NULL.</li>
+            </ul>
+        </div>
+
+        <div class="relation">
+            <span class="relation-name">Position</span> (<span class="attributes"><u><i>account_id</i></u>, <u><i>cusip</i></u>, <u>as_of_date</u>, units</span>)
+            <ul class="fk-list">
+                <li><i>account_id</i> refers to account_id in Account, NOT NULL.</li>
+                <li><i>cusip</i> refers to cusip in Security, NOT NULL.</li>
+            </ul>
+        </div>
+
+        <div class="relation">
+            <span class="relation-name">CorporateAction</span> (<span class="attributes"><u>action_id</u>, <i>cusip</i>, action_type, ex_date, record_date, pay_date, adjustment_factor, new_security_name, new_symbol</span>)
+            <ul class="fk-list">
+                <li><i>cusip</i> refers to cusip in Security, NOT NULL.</li>
+            </ul>
+        </div>
+
+        <div class="relation">
+            <span class="relation-name">MarketData</span> (<span class="attributes"><u><i>cusip</i></u>, <u>date</u>, open_price, close_price, daily_high, daily_low, volume</span>)
+            <ul class="fk-list">
+                <li><i>cusip</i> refers to cusip in Security, NOT NULL.</li>
+            </ul>
+        </div>
+
+    </div>
+</body>
+</html>
